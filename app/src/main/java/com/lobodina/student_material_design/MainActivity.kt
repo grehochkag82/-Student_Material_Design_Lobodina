@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Surface
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import com.lobodina.student_material_design.data.Student
 import com.lobodina.student_material_design.data.students
@@ -59,6 +60,7 @@ fun StudentIcon(
             .padding(dimensionResource(R.dimen.padding_small))
             .clip(MaterialTheme.shapes.small) ,
         painter = painterResource(studentIcon),
+        contentScale = ContentScale.Crop,
         contentDescription = null
     )
 }
