@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.material3.Surface
 import androidx.compose.ui.res.stringResource
 import com.lobodina.student_material_design.data.Student
@@ -85,20 +86,26 @@ fun StudentItem(
     student: Student,
     modifier: Modifier = Modifier
 ){
-    Row(
-        modifier= modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.padding_small))
-    ){
-        StudentIcon(student.imageResourceId)
-        StudentInformation(student.name, student.age)
-    }
 
+    Card(modifier= modifier) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.padding_small))
+        ) {
+            StudentIcon(student.imageResourceId)
+            StudentInformation(student.name, student.age)
+        }
+    }
 }@Composable
 fun StudentApp(){
     LazyColumn {
         items(students){
-            StudentItem( student = it)
+            StudentItem(
+                student = it,
+                modifier = Modifier
+                .padding(dimensionResource(R.dimen.padding_small))
+            )
         }
     }
 }
