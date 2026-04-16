@@ -6,6 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,14 +26,24 @@ import com.lobodina.student_material_design.ui.theme.Student_Material_DesignThem
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -88,40 +101,53 @@ fun StudentInformation(
 }
 
 @Composable
-fun StudentItem(
-    student: Student,
-    modifier: Modifier = Modifier
-){
+fun StudentItem(student: Student) {
+    var expanded by remember { mutableStateOf(false) }
 
-    Card(modifier= modifier) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize()
+    ) {
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_small))
+                .padding(dimensionResource(R.dimen.padding_medium))
         ) {
             StudentIcon(student.imageResourceId)
             StudentInformation(student.name, student.age)
+            Spacer(modifier = Modifier.weight(1f))
+            StudentItemButton(
+                expanded = expanded,
+                onClick = { expanded = !expanded }
+            )
+        }
+
+        if (expanded) {
+            StudentDescription(
+                studentDescription = student.description,
+                modifier = Modifier.padding(
+                    start = dimensionResource(R.dimen.padding_medium),
+                    top = dimensionResource(R.dimen.padding_small),
+                    end = dimensionResource(R.dimen.padding_medium),
+                    bottom = dimensionResource(R.dimen.padding_medium)
+                )
+            )
         }
     }
-}@Composable
+}
+@Composable
 fun StudentApp() {
-    Scaffold (
-        topBar = {
-            StudentTopAppBar()
-        }
-            ){it ->
-            LazyColumn(contentPadding = it) {
-                items(students) {
-                    StudentItem(
-                        student = it,
-                        modifier = Modifier
-                            .padding(dimensionResource(R.dimen.padding_small))
-                    )
-                }
+    Scaffold(
+        topBar = { StudentTopAppBar() }
+    ) { paddingValues ->  // ← лучше, чем it
+        LazyColumn(contentPadding = paddingValues) {
+            items(students) { student ->  // ← лучше, чем it
+                StudentItem(student = student)
             }
         }
     }
-
+    }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentTopAppBar(modifier: Modifier = Modifier){
@@ -165,3 +191,27 @@ fun StudentDarkThemePreview(){
     }
 }
 
+@Composable
+fun StudentItemButton(expanded: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    IconButton(onClick = onClick, modifier = modifier) {
+        Icon(
+            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+            contentDescription = stringResource(R.string.expand_button_content_description),
+            tint = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+@Composable
+fun StudentDescription(@StringRes studentDescription: Int, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(R.string.about),
+            style = MaterialTheme.typography.labelSmall
+        )
+        Text(
+            text = stringResource(studentDescription),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
